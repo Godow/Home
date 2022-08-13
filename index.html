@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Search</title>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-input 
+            v-model="content"
+            placeholder="" 
+            @keyup.enter.native="startSearch"
+            ref="searchInput"
+            class="search-input">
+        </el-input>
+
+        <el-button @click="startSearch" class="search-btn">Search</el-button>
+
+        <div v-if="!editMode" class="radio-box">
+            <template  v-for="item in localStorageData">
+                <el-radio class="raido-item" v-model="engine" :label=item.engine>{{item.name}}</el-radio>
+            </template>
+        </div>
+        <div v-else>
+            <el-input :rows="15" type="textarea" v-model="localStorageStr"/>
+
+        </div>
+
+        <div class="edit" v-if="!editMode"  @click="editMode = true">
+            Edit
+        </div>
+        <div class="edit" v-else  @click="saveList()">
+            Save
+        </div>
+        
+    </div>
+
+    <script>
+        var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                content: '',
+                engine:  '',
+                localStorageData: [],
+                localStorageStr: '',
+                editMode: false
+            }
+            
+        },
+        watch: {
+            localStorageData() {
+                this.localStorageStr = JSON.stringify(this.localStorageData);
+            }
+        },
+        computed: {
+        },
+        mounted() {
+            this.initList();
+
+            // 输入框自动获取焦点
+            this.$nextTick(()=>{
+        　　    this.$refs.searchInput.focus();
+    　　    });
+        },
+        methods: {
+            // 初始化引擎数据
+            initList() {
+                const initialList = [
+                        {name: '百度', engine: 'https://www.baidu.com/s?wd='},
+                        {name: '谷歌', engine: 'https://www.google.com.hk/search?q='}
+                    ];
+                const localStorageData = localStorage.getItem('mySearch');
+                if (!localStorageData) {
+                    this.localStorageData = initialList;
+                    localStorage.setItem('mySearch', JSON.stringify(this.localStorageData));
+                } else {
+                    try {
+                        this.localStorageData = JSON.parse(localStorageData);
+                    } catch(e) {
+                        this.localStorageData = initialList;
+                        localStorage.setItem('mySearch', JSON.stringify(this.localStorageData));
+                    }
+                }
+                // 初始选中第一个单选框
+                this.engine = this.localStorageData?.[0]?.engine;
+            },
+            // 开始搜索
+            startSearch() {
+                if (this.content) {
+                    location.href = this.engine + this.content;
+                }
+            },
+            saveList() {
+                try {
+                    this.localStorageData = JSON.parse(this.localStorageStr);
+                    localStorage.setItem('mySearch', this.localStorageStr);
+                    // 初始选中第一个单选框
+                    this.engine = this.localStorageData?.[0]?.engine;
+                    // 关闭编辑模式
+                    this.editMode = false;
+                } catch(e) {
+                    this.$message('格式错误');
+                }
+                
+            }
+        }
+        })
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .search-input {
+            width: 70vw;
+            display: block;
+            margin: auto;
+            margin-top: 50px;
+        }
+        .search-btn {
+            margin-top: 20px;
+            display: block;
+            margin: 30px auto;
+        }
+        .radio-box {
+            display: grid;
+            width: 90vw;
+            margin: auto;
+            margin-top: 50px;
+            grid-template-columns: auto auto auto;
+            grid-gap: 30px;
+            text-align: center;
+            /* width: 80vw; */
+            /* display: flex; */
+            /* justify-content: center;
+            flex-wrap: wrap; */
+        }
+        /* .radio-item {
+            display: block;
+            width: 20vw;
+        } */
+        .edit {
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            background-color: goldenrod;
+            color:blanchedalmond;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0.5;
+            position: fixed;
+            bottom: 100px;
+            right: 5px;
+        }
+    </style>
+</body>
+</html>
