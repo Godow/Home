@@ -58,7 +58,7 @@
         },
         watch: {
             localStorageData() {
-                this.localStorageStr = JSON.stringify(this.localStorageData);
+                this.localStorageStr = JSON.stringify(this.localStorageData, null, 2);
             }
         },
         computed: {
