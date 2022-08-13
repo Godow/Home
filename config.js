@@ -1,8 +1,10 @@
 
 // 搜索引擎
 const engines = [
-    {name: '百度', engine: 'https://www.baidu.com/s?wd='},
-    {name: '谷歌', engine: 'https://www.google.com.hk/search?q='}
+    {name: 'baidu', engine: 'https://www.baidu.com/s?wd='},
+    {name: 'yandex', engine: 'https://yandex.com/search/?text='},
+    {name: 'ecosia', engine: 'https://www.ecosia.org/search?q='},
+    {name: 'google', engine: 'https://www.google.com.hk/search?q='}
 ];
 
 // 搜藏列表
