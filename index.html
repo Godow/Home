@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Search</title>
+    <title>MSearch</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-cion" />
     <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- 引入样式 -->
@@ -14,6 +15,9 @@
 </head>
 <body>
     <div id="app">
+        <div class="title">
+            MSearch
+        </div>
         <el-input 
             v-model="content"
             placeholder="" 
@@ -24,94 +28,61 @@
 
         <el-button @click="startSearch" class="search-btn">Search</el-button>
 
-        <div v-if="!editMode" class="radio-box">
-            <template  v-for="item in localStorageData">
+        <div class="radio-box">
+            <template  v-for="item in engines">
                 <el-radio class="raido-item" v-model="engine" :label=item.engine>{{item.name}}</el-radio>
             </template>
         </div>
-        <div v-else>
-            <el-input :rows="15" type="textarea" v-model="localStorageStr"/>
-
-        </div>
-
-        <div class="edit" v-if="!editMode"  @click="editMode = true">
-            Edit
-        </div>
-        <div class="edit" v-else  @click="saveList()">
-            Save
-        </div>
         
+        <div class="collection">
+            <template v-for="key in Object.keys(list)">
+                <el-divider>{{key}}</el-divider>
+                <template :title=list[key].name :name=list[key].name>
+                    <div class="collection-group">
+                        <template v-for="item in list[key]">
+                            <el-button :key=item.engine class="collection-btn" type="success" plain size="small" @click="href(item.engine)">{{item.name}}</el-button>
+                        </template>
+                    </div>
+                    
+                </template>
+            </template>
+        </div>
     </div>
 
-    <script>
+    <script type="module">
+        import {engines, collection} from './config.js';
         var app = new Vue({
         el: '#app',
         data() {
             return {
                 content: '',
                 engine:  '',
-                localStorageData: [],
-                localStorageStr: '',
-                editMode: false
+                list: collection,
+                engines
             }
             
-        },
-        watch: {
-            localStorageData() {
-                this.localStorageStr = JSON.stringify(this.localStorageData, null, 2);
-            }
         },
         computed: {
         },
         mounted() {
-            this.initList();
-
             // 输入框自动获取焦点
             this.$nextTick(()=>{
-        　　    this.$refs.searchInput.focus();
-    　　    });
+                this.$refs.searchInput.focus();
+            });
+
+            // 初始选中第一个单选框
+            this.engine = this.engines?.[0]?.engine;
         },
         methods: {
-            // 初始化引擎数据
-            initList() {
-                const initialList = [
-                        {name: '百度', engine: 'https://www.baidu.com/s?wd='},
-                        {name: '谷歌', engine: 'https://www.google.com.hk/search?q='}
-                    ];
-                const localStorageData = localStorage.getItem('mySearch');
-                if (!localStorageData) {
-                    this.localStorageData = initialList;
-                    localStorage.setItem('mySearch', JSON.stringify(this.localStorageData));
-                } else {
-                    try {
-                        this.localStorageData = JSON.parse(localStorageData);
-                    } catch(e) {
-                        this.localStorageData = initialList;
-                        localStorage.setItem('mySearch', JSON.stringify(this.localStorageData));
-                    }
-                }
-                // 初始选中第一个单选框
-                this.engine = this.localStorageData?.[0]?.engine;
-            },
             // 开始搜索
             startSearch() {
                 if (this.content) {
                     location.href = this.engine + this.content;
                 }
             },
-            saveList() {
-                try {
-                    this.localStorageData = JSON.parse(this.localStorageStr);
-                    localStorage.setItem('mySearch', this.localStorageStr);
-                    // 初始选中第一个单选框
-                    this.engine = this.localStorageData?.[0]?.engine;
-                    // 关闭编辑模式
-                    this.editMode = false;
-                } catch(e) {
-                    this.$message('格式错误');
-                }
-                
-            }
+            href(url) {
+                location.href = url;
+            },
         }
         })
     </script>
@@ -120,11 +91,21 @@
             margin: 0;
             padding: 0;
         }
+        .title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 30px;
+            font-family: Arial;
+            margin: 0 auto;
+            margin-top: 50px;
+            margin-bottom: 5px;
+            
+        }
         .search-input {
             width: 70vw;
             display: block;
             margin: auto;
-            margin-top: 50px;
+            
         }
         .search-btn {
             margin-top: 20px;
@@ -133,21 +114,13 @@
         }
         .radio-box {
             display: grid;
-            width: 90vw;
-            margin: auto;
+            width: 100vw;
+            margin: 50px auto;
             margin-top: 50px;
-            grid-template-columns: auto auto auto;
+            grid-template-columns: repeat(3, 1fr);
             grid-gap: 30px;
             text-align: center;
-            /* width: 80vw; */
-            /* display: flex; */
-            /* justify-content: center;
-            flex-wrap: wrap; */
         }
-        /* .radio-item {
-            display: block;
-            width: 20vw;
-        } */
         .edit {
             width: 50px;
             height: 50px;
@@ -161,6 +134,33 @@
             position: fixed;
             bottom: 100px;
             right: 5px;
+        }
+        .collection {
+            width: 96vw;
+            margin: auto;
+            margin-top: 60px;
+            overflow: hidden;
+        }
+        .collection-group {
+            width: 96vw;
+            display: flex;
+            flex-wrap: wrap;;
+            justify-content: space-between;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+        .collection-btn {
+            margin: 10px 0;
+            margin-right: 20px;
+            width: 100px;
+        }
+
+        .el-button+.el-button, .el-checkbox.is-bordered+.el-checkbox.is-bordered {
+            margin-left: 0;
+        }
+
+        .el-cascader-node>.el-radio, .el-radio:last-child {
+            margin-right: 30px;
         }
     </style>
 </body>
