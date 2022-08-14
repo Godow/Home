@@ -10,16 +10,28 @@ const engines = [
 
 // 搜藏列表
 const collection = {
-    "实用": [
+    "资源": [
         {
             "name": "高清图库",
             "engine": "https://unsplash.com"
         }
     ],
-    "娱乐": [
+    "工具": [
         {
             "name": "影视解析",
             "engine": "https://svip.bljiex.cc"
+        },
+        {
+            "name": "Greasy Fork",
+            "engine": "https://greasyfork.org/zh-CN"
+        },
+        {
+            "name": "万能命令",
+            "engine": "https://wn.run"
+        },
+        {
+            "name": "MikuTools",
+            "engine": "https://tools.miku.ac"
         }
     ]
 };
